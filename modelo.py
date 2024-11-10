@@ -1,9 +1,7 @@
-import pulp
 from generadores.salas import generador_conjunto_Salas
 from generadores.asignaturas import generador_conjunto_Asignaturas
 from generadores.profesores import generar_conjunto_profesores
 from generadores.restricciones import generar_restricciones
-from generadores.variables import generar_variables
 
 # Parámetros de entrada
 cantidad_asignaturas = 35
@@ -20,26 +18,28 @@ d_index = list(range(1, 6))
 b_index = list(range(1, 8))
 p_index = list(range(1, cantidad_profesores + 1))
 s_index = list(range(cantidad_salas))
-double_index = [0, 1]
 
-# Definición del problema
-problema = pulp.LpProblem("Asignacion_Optima", pulp.LpMaximize)
+modelo = []
+funcion_Obj = "max: "
+variables = "bin "
+for a in a_index:
+    for d in d_index:
+        for b in b_index:
+            for p in p_index:
+                for s in s_index:
+                    funcion_Obj += f"{A[a]['prioridad']} x_{a}_{d}_{b}_{p}_{s}_1 + {A[a]['prioridad']} x_{a}_{d}_{b}_{p}_{s}_2 + "
+for a in a_index:
+    for d in d_index:
+        for b in b_index:
+            for p in p_index:
+                for s in s_index:
+                    variables += f"x_{a}_{d}_{b}_{p}_{s}_1, x_{a}_{d}_{b}_{p}_{s}_2, "
+                    
+modelo.append(funcion_Obj.rstrip(" + ") + ";")
+modelo.append(variables.rstrip(", ") + ";")
 
-# Definición de variables de decisión
-x = generar_variables(a_index, d_index, b_index, s_index, p_index, double_index)
+generar_restricciones(A, Y, S, modelo, a_index, d_index, b_index, s_index, p_index)
 
-# Función objetivo
-problema += pulp.lpSum(
-    A[a]['prioridad'] * x[(a, d, b, s, p, double)]
-    for a in a_index
-    for d in d_index
-    for b in b_index
-    for s in s_index
-    for p in p_index
-    for double in double_index
-    
-)
-
-# Generación de restricciones
-generar_restricciones(A, Y, S, x, problema, a_index, d_index, b_index, s_index, p_index)
-problema.writeLP("./modelo.lp")
+with open("modelo.lp", "w") as file:
+    for line in modelo:
+        file.write(line + "\n")
