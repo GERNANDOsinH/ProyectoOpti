@@ -1,7 +1,7 @@
 import random
 
 def generador_conjunto_Asignaturas(n: int):
-    # A[i] = {n_bloques, prioridad_i, n_alumnos}
+    # A[i] = {n_bloques, prioridad, n_alumnos}
 
     A = {}
 

@@ -1,12 +1,12 @@
 import pulp
 
-def generar_variables(A, n_salas: int, n_profesores: int):
-    a_index = A.keys()
-    d_index = [1, 2, 3, 4, 5]
-    b_index = [1, 2, 3, 4, 5, 6, 7]
-    p_index = [{i} for i in range(1, n_profesores + 1)]
-    s_index = [{i} for i in range(n_salas)]
-    double_index = [0, 1]
-    x = pulp.LpVariable.dicts("x", (a_index, d_index, b_index, s_index, p_index, double_index), cat='Binary')
-
+def generar_variables(a_index, d_index, b_index, s_index, p_index, double_index):
+    x = {}
+    for a in a_index:
+        for d in d_index:
+            for b in b_index:
+                for s in s_index:
+                    for p in p_index:
+                            for double in double_index:
+                                x[(a, d, b, s, p, double)] = pulp.LpVariable(f"x_{a}_{d}_{b}_{s}_{p}_{double}", cat='Binary')
     return x

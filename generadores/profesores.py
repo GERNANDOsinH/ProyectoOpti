@@ -6,8 +6,8 @@ def generar_conjunto_profesores(n_profesores: int, n_estudiantes: int):
     while p <= n_profesores:
         n = 0
         for a in range(1, n_estudiantes + 1):
-            for d in ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"]:
-                for b in range(1, 7 + 1):
+            for d in range(1, 6):
+                for b in range(1, 8):
                     if (n < 28):
                         r = random.randint(0, 1)
                         n += r
