@@ -1,46 +1,65 @@
-def generar_restricciones(A, Y, S, n_asignaturas: int, n_salas: int, n_profesores):
-    restricciones = []
-    for d in range(1, 6):
-        for b in range(1, 8):
-            for s in range(1, n_salas + 1):
-                restriccion = ""
-                for p in range(1, n_profesores + 1):
-                    for a in range(1, n_asignaturas + 1):
-                        # Para que una asignatura ocupe una sala solo si su numero de estudiantes debe ser menor o igual a la capacidad de esa sala.
-                        restricciones.append(f"{A[a]['n_alumnos']} x_{a}_{d}_{b}_{s}_{p} + {A[a]['n_alumnos']} m_{a}_{d}_{b}_{s}_{p} <= {S[s]};")
+import pulp
 
-                        # Para que una asignatura sea impartida por un profesor este debe poder rendir esta misma en el horario asignado.
-                        restricciones.append(f"{A[a]['n_alumnos']} x_{a}_{d}_{b}_{s}_{p} + {A[a]['n_alumnos']} m_{a}_{d}_{b}_{s}_{p} <= {Y[p][a][d][b]};")
-                        
-                        # Una sala solo puede contener una clase a la vez.
-                        restriccion = restriccion + f"x_{a}_{d}_{b}_{s}_{p} + m_{a}_{d}_{b}_{s}_{p} + "
-                restriccion = restriccion.rstrip(" + ") + " <= 1;"
-                restricciones.append(restriccion)
-            for p in range(1, n_profesores + 1):
-                restriccion = ""
-                for s in range(1, n_salas + 1):
-                    for a in range (1, n_asignaturas + 1):
-                        # Un profesor solo puede realizar una clase en un bloque.
-                        restriccion = restriccion + f"x_{a}_{d}_{b}_{s}_{p} + m_{a}_{d}_{b}_{s}_{p} + "
-                restriccion = restriccion.rstrip(" + ") + " <= 1;"
-                restricciones.append(restriccion)
-    for a in range(1, n_asignaturas + 1):
-        restriccion = ""
-        restriccion_1 = ""
+def generar_restricciones(A, Y, S, n_salas: int, n_profesores: int, x, modelo):
+    generar_restricciones_asignacion(A, n_profesores, n_salas, modelo, x)
+    generar_restricciones_capacidad(A, S, n_profesores, x, modelo)
+    generar_restricciones_profesores(A, S, n_profesores, x, modelo, Y)
+    generar_restricciones_multiAsignacion(A, S, n_profesores, x, modelo)
+
+def generar_restricciones_capacidad(A, S, n_profesores, x, modelo):
+    for a in A.keys():
         for d in range(1, 6):
             for b in range(1, 8):
-                for p in range(1 , n_profesores):
-                    for s in range(1, n_salas + 1):
-                        restriccion = restriccion + f"x_{a}_{d}_{b}_{s}_{p} + m_{a}_{d}_{b}_{s}_{p} + "
-                        restriccion_1 = restriccion_1 + f"{2 - A[a]['n_bloques']} x_{a}_{d}_{b}_{s}_{p} + {A[a]['n_bloques'] - 1} m_{a}_{d}_{b}_{s}_{p} + "
-        restriccion = restriccion.rstrip(" + ")
-        restriccion_1 = restriccion_1.rstrip(" + ")
-        if (A[a]['prioridad'] <= 5):
-            restriccion = restriccion + " <= 1;"
-            restriccion_1 = restriccion_1 + " <= 1;"
+                for p in range(1, n_profesores + 1):
+                    for s in range(len(S)):
+                        modelo += (A[a]['n_alumnos'])*(x[a][d][b][s][p][0] + x[a][d][b][s][p][1]) <= S[s],
+
+def generar_restricciones_asignacion(A, n_profesores, n_salas, modelo, x):
+    d_index = [1, 2, 3, 4, 5]
+    b_index = [1, 2, 3, 4, 5, 6, 7]
+    s_index = [{i} for i in range(n_salas)]
+    p_index = [{i} for i in range(1, n_profesores + 1)]
+    for a in A.keys():
+        if 6 <= A[a]['prioridad']:
+            modelo += pulp.lpSum(x[a][d][b][s][p][0] + x[a][d][b][s][p][1] for d in d_index
+                                         for b in b_index
+                                         for s in s_index
+                                         for p in p_index) == 1,
+            modelo += pulp.lpSum((2 - A[a]['n_bloques']) * x[a][d][b][s][p][0] + (A[a]['n_bloques'] - 1) * x[a][d][b][s][p][1] for d in d_index
+                                         for b in b_index
+                                         for s in s_index
+                                         for p in p_index) == 1,
         else:
-            restriccion = restriccion + " = 1;"
-            restriccion_1 = restriccion_1 + " = 1;"
-        restricciones.append(restriccion)
-        restricciones.append(restriccion_1)
-    return restricciones
+            modelo += pulp.lpSum(x[a][d][b][s][p][0] + x[a][d][b][s][p][1] for d in d_index
+                                         for b in b_index
+                                         for s in s_index
+                                         for p in p_index) <= 1,
+            modelo += pulp.lpSum((2 - A[a]['n_bloques']) * x[a][d][b][s][p][0] + (A[a]['n_bloques'] - 1) * x[a][d][b][s][p][1] for d in d_index
+                                         for b in b_index
+                                         for s in s_index
+                                         for p in p_index) <= 1,
+
+def generar_restricciones_profesores(A, S, n_profesores, x, modelo, Y):
+    for a in A.keys():
+        for d in range(1, 6):
+            for b in range(1, 8):
+                for s in range(len(S)):
+                    for p in range(1, n_profesores + 1):
+                        modelo += x[a][d][b][s][p][0] + x[a][d][b][s][p][1] <= Y[p][a][d][b],
+
+def generar_restricciones_multiAsignacion(A, S, n_profesores, x, modelo):
+    a_index = A.keys()
+    s_index = [{i} for i in range(len(S))]
+    p_index = [{i} for i in range(1, n_profesores + 1)]
+    for d in range(1, 6):
+        for b in range(1, 8):
+            for s in s_index:
+                modelo += pulp.lpSum(x[a][d][b][s][p][0] + x[a][d][b][s][p][1]
+                                         for a in a_index
+                                         for p in p_index) <= 1,
+    for d in range(1, 6):
+        for b in range(1, 8):
+            for p in p_index:
+                modelo += pulp.lpSum(x[a][d][b][s][p][0] + x[a][d][b][s][p][1]
+                                         for a in a_index
+                                         for s in s_index) <= 1,

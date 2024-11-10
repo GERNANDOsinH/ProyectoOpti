@@ -9,8 +9,14 @@ def generar_conjunto_profesores(n_profesores: int, n_estudiantes: int):
             for d in ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"]:
                 for b in range(1, 7 + 1):
                     if (n < 28):
-                        r = random.choice([0, 1])
+                        r = random.randint(0, 1)
                         n += r
+                        if p not in Y:
+                            Y[p] = {}
+                        if a not in Y[p]:
+                            Y[p][a] = {}
+                        if d not in Y[p][a]:
+                            Y[p][a][d] = {}
                         Y[p][a][d][b] = r
         if (14 <= n):
             p += 1
