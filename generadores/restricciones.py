@@ -23,11 +23,11 @@ def generar_restricciones_asignacion(A: dict, modelo: list, a_index, d_index, b_
                         restriccion += f"x_{a}_{d}_{b}_{p}_{s}_1 + x_{a}_{d}_{b}_{p}_{s}_2 + "
                         restriccion1 += f"{(2 - A[a]['n_bloques'])} x_{a}_{d}_{b}_{p}_{s}_1 + {(A[a]['n_bloques'] - 1)} x_{a}_{d}_{b}_{p}_{s}_2 +"
         if 6 <= A[a]['prioridad']:
-            restriccion = restriccion.rstrip(" + ") + " == 1"
-            restriccion1 = restriccion1.rstrip(" + ") + " == 1"
+            restriccion = restriccion.rstrip(" + ") + " == 1;"
+            restriccion1 = restriccion1.rstrip(" + ") + " == 1;"
         else:
-            restriccion = restriccion.rstrip(" + ") + " <= 1"
-            restriccion1 = restriccion1.rstrip(" + ") + " <= 1"
+            restriccion = restriccion.rstrip(" + ") + " <= 1;"
+            restriccion1 = restriccion1.rstrip(" + ") + " <= 1;"
         
         modelo.append(restriccion)
         modelo.append(restriccion1)
