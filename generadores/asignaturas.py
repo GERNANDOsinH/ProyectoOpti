@@ -11,7 +11,8 @@ def generador_conjunto_Asignaturas(n: int):
     n_bloques_2 = n - n_bloques_1
 
     while i < 0.2 * n:
-        prioridad = random.randint(6, 10)
+        # prioridad = random.randint(6, 10)
+        prioridad = 6
         n_alumnos = random.randint(10, 40)
         r = random.randint(1, 100)
         if (r <= 65 and n_bloques_1 != 0):
@@ -34,7 +35,8 @@ def generador_conjunto_Asignaturas(n: int):
     m = i
 
     while i < n - m:
-        prioridad = random.randint(1, 5)
+        # prioridad = random.randint(1, 5)
+        prioridad = 1
         n_alumnos = random.randint(10, 40)
         r = random.randint(1, 100)
         if (r <= 65 and n_bloques_1 != 0):
