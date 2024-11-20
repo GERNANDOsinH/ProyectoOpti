@@ -1,10 +1,10 @@
 import random
 
 def generador_conjunto_Asignaturas(n: int):
-    bloques_asignatura = list
-    alumnos_asignatura = list
-    prioridad_asignatura = list
-    Y = dict
+    bloques_asignatura = []
+    alumnos_asignatura = []
+    prioridad_asignatura = []
+    Y = {}
 
     i = 0
 
@@ -54,8 +54,8 @@ def generador_conjunto_Asignaturas(n: int):
                 if (k < 28):
                     r = random.randint(0, 1)
                     k += r
-                    Y[a] = dict
-                    Y[a][d] = dict
+                    Y[a] = {}
+                    Y[a][d] = {}
                     Y[a][d][b] = r
         if (14 <= k):
             a += 1

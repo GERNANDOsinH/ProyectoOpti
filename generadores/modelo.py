@@ -1,8 +1,8 @@
 import pulp
-from salas import generador_conjunto_Salas
-from asignaturas import generador_conjunto_Asignaturas
-from restricciones import generar_restricciones
-from variables import generar_variables
+from .salas import generador_conjunto_Salas
+from .asignaturas import generador_conjunto_Asignaturas
+from .restricciones import generar_restricciones
+from .variables import generar_variables
 
 def generador_de_modelo(cantidad_salas: int, cantidad_asignaturas: int):
     bloques_asignatura, alumnos_asignatura, prioridad_asignatura, Y = generador_conjunto_Asignaturas(cantidad_asignaturas)
